@@ -14,11 +14,7 @@ const common_1 = require("@nestjs/common");
 let AppService = class AppService {
     constructor() { }
     getHello() {
-        return {
-            code: 0,
-            message: 'Hello from Typescript',
-            data: {},
-        };
+        return 'Hello from Typescript';
     }
 };
 AppService = __decorate([
