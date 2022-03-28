@@ -15,8 +15,7 @@ services:
     networks:
       - my_network
   backend:
-    image: nest-js
-    build: .
+    image: duyhp2405/cv:1.0
     restart: always
     container_name: backend
     ports:
