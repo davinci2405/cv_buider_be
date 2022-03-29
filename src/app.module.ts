@@ -34,6 +34,6 @@ declare module 'express' {
 })
 export class AppModule implements NestModule {
   configure(consumer: MiddlewareConsumer) {
-    consumer.apply(AuthMiddleware).exclude('auth/(.*)').forRoutes('*');
+    consumer.apply(AuthMiddleware).exclude('auth/(.*)', 'products', 'products/:id').forRoutes('*');
   }
 }
