@@ -1,29 +1,9 @@
 version: "3"
-networks:
-  my_network:
-    driver: bridge
 services:
-  db:
-    platform: linux/x86_64
-    image: mysql:5.7.32
-    environment:
-      MYSQL_ROOT_PASSWORD: "1"
-    command: mysqld --sql_mode='' --max_allowed_packet=32505856
-    ports:
-      - "3306:3306"
-    volumes:
-      - ../mysql:/var/lib/mysql
-    networks:
-      - my_network
-  backend:
+  nestjs:
+    build:
+      context: .
+      dockerfile: ./Dockerfile
     image: duyhp2405/cv:1.0
-    restart: always
-    container_name: backend
     ports:
       - '8080:8080'
-    depends_on:
-      - db
-    links:
-      - db
-    networks:
-      - my_network

@@ -1,29 +1,30 @@
 import { Injectable } from '@nestjs/common';
-import { InjectRepository } from '@nestjs/typeorm';
-import { Repository } from 'typeorm';
+import { Model } from 'mongoose';
 import { CreateProductDto } from './dto/products.dto';
-import { ProductsEntity } from './products.entity';
+import { Products } from './products.schema';
+import { InjectModel } from '@nestjs/mongoose';
 
 @Injectable()
 export class ProductsService {
-  constructor(
-    @InjectRepository(ProductsEntity)
-    private productRepository: Repository<ProductsEntity>
-  ) {}
+  constructor(@InjectModel('Products') private productModel: Model<Products>) {}
 
-  async getAll(): Promise<ProductsEntity[]> {
-    return await this.productRepository.find({});
+  async getAll(): Promise<Products[]> {
+    return await this.productModel.find().exec();
   }
 
   async getProductById(id: number): Promise<any> {
     try {
-      const product = await this.productRepository.findOne(id);
+      const product = await this.productModel.findById(id).exec();
       if (product) {
         return {
           isSuccess: true,
           data: product,
         };
       }
+      return {
+        isSuccess: false,
+        data: null,
+      };
     } catch (e) {
       console.log(e);
     }
@@ -35,9 +36,8 @@ export class ProductsService {
 
   async createProduct(productInfo: CreateProductDto): Promise<any> {
     try {
-      let product = new ProductsEntity();
-      product = this.productRepository.create(productInfo);
-      const response = await this.productRepository.save(product);
+      const product = new this.productModel(productInfo);
+      const response = await product.save();
       return {
         isSuccess: true,
         data: response,
@@ -52,10 +52,10 @@ export class ProductsService {
   }
 
   async removeProduct(id: number): Promise<any> {
-    const product = await this.productRepository.findOne(id);
+    const product = await this.productModel.findById(id);
     if (product) {
       try {
-        await this.productRepository.delete(id);
+        await this.productModel.findByIdAndDelete({ id: product.id });
         return {
           isSuccess: true,
           data: null,

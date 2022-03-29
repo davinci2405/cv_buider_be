@@ -14,25 +14,28 @@ var __param = (this && this.__param) || function (paramIndex, decorator) {
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.ProductsService = void 0;
 const common_1 = require("@nestjs/common");
-const typeorm_1 = require("@nestjs/typeorm");
-const typeorm_2 = require("typeorm");
-const products_entity_1 = require("./products.entity");
+const mongoose_1 = require("mongoose");
+const mongoose_2 = require("@nestjs/mongoose");
 let ProductsService = class ProductsService {
-    constructor(productRepository) {
-        this.productRepository = productRepository;
+    constructor(productModel) {
+        this.productModel = productModel;
     }
     async getAll() {
-        return await this.productRepository.find({});
+        return await this.productModel.find().exec();
     }
     async getProductById(id) {
         try {
-            const product = await this.productRepository.findOne(id);
+            const product = await this.productModel.findById(id).exec();
             if (product) {
                 return {
                     isSuccess: true,
                     data: product,
                 };
             }
+            return {
+                isSuccess: false,
+                data: null,
+            };
         }
         catch (e) {
             console.log(e);
@@ -44,9 +47,8 @@ let ProductsService = class ProductsService {
     }
     async createProduct(productInfo) {
         try {
-            let product = new products_entity_1.ProductsEntity();
-            product = this.productRepository.create(productInfo);
-            const response = await this.productRepository.save(product);
+            const product = new this.productModel(productInfo);
+            const response = await product.save();
             return {
                 isSuccess: true,
                 data: response,
@@ -61,10 +63,10 @@ let ProductsService = class ProductsService {
         };
     }
     async removeProduct(id) {
-        const product = await this.productRepository.findOne(id);
+        const product = await this.productModel.findById(id);
         if (product) {
             try {
-                await this.productRepository.delete(id);
+                await this.productModel.findByIdAndDelete({ id: product.id });
                 return {
                     isSuccess: true,
                     data: null,
@@ -82,8 +84,8 @@ let ProductsService = class ProductsService {
 };
 ProductsService = __decorate([
     (0, common_1.Injectable)(),
-    __param(0, (0, typeorm_1.InjectRepository)(products_entity_1.ProductsEntity)),
-    __metadata("design:paramtypes", [typeorm_2.Repository])
+    __param(0, (0, mongoose_2.InjectModel)('Products')),
+    __metadata("design:paramtypes", [mongoose_1.Model])
 ], ProductsService);
 exports.ProductsService = ProductsService;
 //# sourceMappingURL=products.service.js.map

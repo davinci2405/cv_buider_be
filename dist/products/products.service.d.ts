@@ -1,10 +1,10 @@
-import { Repository } from 'typeorm';
+import { Model } from 'mongoose';
 import { CreateProductDto } from './dto/products.dto';
-import { ProductsEntity } from './products.entity';
+import { Products } from './products.schema';
 export declare class ProductsService {
-    private productRepository;
-    constructor(productRepository: Repository<ProductsEntity>);
-    getAll(): Promise<ProductsEntity[]>;
+    private productModel;
+    constructor(productModel: Model<Products>);
+    getAll(): Promise<Products[]>;
     getProductById(id: number): Promise<any>;
     createProduct(productInfo: CreateProductDto): Promise<any>;
     removeProduct(id: number): Promise<any>;

@@ -11,25 +11,13 @@ const common_1 = require("@nestjs/common");
 const app_controller_1 = require("./app.controller");
 const app_service_1 = require("./app.service");
 const products_module_1 = require("./products/products.module");
-const typeorm_1 = require("@nestjs/typeorm");
+const mongoose_1 = require("@nestjs/mongoose");
 let AppModule = class AppModule {
 };
 AppModule = __decorate([
     (0, common_1.Module)({
         imports: [
-            typeorm_1.TypeOrmModule.forRoot({
-                type: 'mysql',
-                host: 'db',
-                port: 3306,
-                username: 'root',
-                password: '1',
-                database: 'cv_builder_db',
-                extra: {
-                    charset: 'utf8mb4_unicode_ci',
-                },
-                synchronize: true,
-                entities: ['dist/**/*.entity{.ts,.js}'],
-            }),
+            mongoose_1.MongooseModule.forRoot('mongodb+srv://duyhp2405:hpduyna123@cluster0.tryjz.mongodb.net/myFirstDatabase?retryWrites=true&w=majority'),
             products_module_1.ProductsModule,
         ],
         controllers: [app_controller_1.AppController],
