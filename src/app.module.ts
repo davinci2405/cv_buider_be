@@ -1,23 +1,39 @@
-import { Module } from '@nestjs/common';
+import { MiddlewareConsumer, Module, NestModule } from '@nestjs/common';
 import { AppController } from './app.controller';
 import { AppService } from './app.service';
 import { ProductsModule } from './products/products.module';
 import { MongooseModule } from '@nestjs/mongoose';
+import { AuthModule } from './auth/auth.module';
+import { ConfigModule, ConfigService } from '@nestjs/config';
+import { AuthMiddleware } from './middleware/auth.middleware';
 
 declare module 'express' {
   export interface Request {
     user: any;
   }
 }
-
 @Module({
   imports: [
-    MongooseModule.forRoot(
-      'mongodb+srv://duyhp2405:hpduyna123@cluster0.tryjz.mongodb.net/myFirstDatabase?retryWrites=true&w=majority'
-    ),
+    ConfigModule.forRoot({
+      envFilePath: '.env',
+    }),
+    MongooseModule.forRootAsync({
+      imports: [ConfigModule],
+      useFactory: (config: ConfigService) => {
+        return {
+          uri: config.get<string>('DB_CONNECTION_STRING'),
+        };
+      },
+      inject: [ConfigService],
+    }),
     ProductsModule,
+    AuthModule,
   ],
   controllers: [AppController],
   providers: [AppService],
 })
-export class AppModule {}
+export class AppModule implements NestModule {
+  configure(consumer: MiddlewareConsumer) {
+    consumer.apply(AuthMiddleware).exclude('auth/(.*)').forRoutes('*');
+  }
+}

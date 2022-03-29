@@ -12,13 +12,31 @@ const app_controller_1 = require("./app.controller");
 const app_service_1 = require("./app.service");
 const products_module_1 = require("./products/products.module");
 const mongoose_1 = require("@nestjs/mongoose");
+const auth_module_1 = require("./auth/auth.module");
+const config_1 = require("@nestjs/config");
+const auth_middleware_1 = require("./middleware/auth.middleware");
 let AppModule = class AppModule {
+    configure(consumer) {
+        consumer.apply(auth_middleware_1.AuthMiddleware).exclude('auth/(.*)').forRoutes('*');
+    }
 };
 AppModule = __decorate([
     (0, common_1.Module)({
         imports: [
-            mongoose_1.MongooseModule.forRoot('mongodb+srv://duyhp2405:hpduyna123@cluster0.tryjz.mongodb.net/myFirstDatabase?retryWrites=true&w=majority'),
+            config_1.ConfigModule.forRoot({
+                envFilePath: '.env',
+            }),
+            mongoose_1.MongooseModule.forRootAsync({
+                imports: [config_1.ConfigModule],
+                useFactory: (config) => {
+                    return {
+                        uri: config.get('DB_CONNECTION_STRING'),
+                    };
+                },
+                inject: [config_1.ConfigService],
+            }),
             products_module_1.ProductsModule,
+            auth_module_1.AuthModule,
         ],
         controllers: [app_controller_1.AppController],
         providers: [app_service_1.AppService],
